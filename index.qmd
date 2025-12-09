@@ -94,7 +94,6 @@ Dados de 143 estações pluviométricas.
 #| fig-width: 7
 #| fig-align: center
 
-# Ajusta as margens para aproveitar melhor o espaço
 par(mar=c(3,3,2,1), mgp=c(2,0.7,0)) 
 plot(parana)
 ```
