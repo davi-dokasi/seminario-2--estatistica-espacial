@@ -1,0 +1,108 @@
+## Estrutura de Dependências:
+::: {style="font-size: 55%;"}
+Agora vamos calcular e plotar o variograma empírico. Ao calcular e visualizar o Variograma Empírico, poderemos entender como a dissimilaridade (semivariância) entre os pontos amostrados aumenta com o aumento da distância entre eles.
+
+Para garantir consistência, o cálculo do variograma será realizado usando tanto a abordagem do gstat quanto do geoR.
+:::
+
+```{r variogramas}
+## VARIOGRAMA EMPÍRICO GSTAT
+coordinates(df_parana) <- ~east+north
+maxdist <- max(dist(sp::coordinates(df_parana)))
+vg_gstat <- variogram(log_rain ~ 1, df_parana, cutoff = maxdist/2)
+
+p1 <- ggplot(vg_gstat, aes(x=dist, y=gamma)) +
+  geom_point(color="steelblue", size=3) +
+  ylim(0, NA) +
+  labs(title="Variograma (gstat)", x="Distância", y="Semivariância") +
+  theme_minimal(base_size = 16)
+
+## VARIOGRAMA GEOR
+vg_geoR <- variog(parana_log, max.dist = max(vg_gstat$dist), messages=FALSE)
+
+df_geoR_plot <- data.frame(dist = vg_geoR$u, gamma = vg_geoR$v)
+
+p2 <- ggplot(df_geoR_plot, aes(x=dist, y=gamma)) +
+  geom_point(color="darkorange", size=3) +
+  ylim(0, NA) +
+  labs(title="Variograma (geoR)", x="Distância", y="Semivariância") +
+  theme_minimal(base_size = 16)
+
+grid.arrange(p1, p2, ncol=2)
+```
+
+
+## Estimação e Ajuste de Modelos:
+::: {style="font-size: 80%;"}
+
+Utilizamos a função ***geoR::likfit*** para ajustar um modelo esférico ao variograma empírico através de máxima verossimilhança (ML). 
+
+Este modelo paramétrico é um método frequentista para obter a estimativa mais provável dos parâmetros que definem o variograma teórico.
+
+
+<br>
+
+**O ajuste gera estimativas para:**
+
+- Efeito Pepita $(τ^2)$: Variabilidade em distâncias muito curtas.
+
+- Patamar Parcial $(σ^2)$: A porção da variância total explicada pela estrutura espacial.
+
+- Alcance $(ϕ)$: A distância a partir da qual os pontos são considerados independentes.
+:::
+
+## Validação:
+::: {style="font-size: 75%;"}
+O Variograma Teórico ajustado é plotado sobre os pontos do Variograma Empírico para avaliar a qualidade do ajuste visualmente.
+:::
+
+```{r validacao_modelos}
+# AJUSTE GSTAT (Mínimos Quadrados Ponderados) 
+init_model <- vgm(psill = var(df_parana$log_rain), model="Sph", 
+                  range=maxdist/3, nugget=0.01)
+fit_vg <- fit.variogram(vg_gstat, model=init_model)
+line_fit_gstat <- variogramLine(fit_vg, maxdist = max(vg_gstat$dist))
+
+p1 <- ggplot() +
+  geom_point(data=vg_gstat, aes(x=dist, y=gamma), size=3, color="steelblue") +
+  geom_line(data=line_fit_gstat, aes(x=dist, y=gamma), color="red", linewidth=1) +
+  labs(title = "Ajuste GSTAT (Mínimos Quadrados)",
+       subtitle = paste0("Nugget: ", round(fit_vg$psill[1], 3), 
+                         " | Sill: ", round(fit_vg$psill[2], 3),
+                         " | Range: ", round(fit_vg$range[2], 1)),
+       x = "Distância (km)", y = "Semivariância") +
+  theme_minimal(base_size = 14) + ylim(0, NA)
+
+# AJUSTE GEOR (Máxima Verossimilhança
+lik_ml <- likfit(parana_log, ini.cov.pars = c(0.1, maxdist/5), nugget = 0.01,
+                 trend = "cte", cov.model = "sph", lik.method = "ML", messages = FALSE)
+
+# PARÂMETROS
+sigsq_ml <- lik_ml$cov.pars[1]
+phi_ml   <- lik_ml$cov.pars[2]
+nug_ml   <- lik_ml$nugget
+
+sph_curve <- function(h, nugget, sill, range) {
+  val <- ifelse(h <= range, 
+                nugget + sill * (1.5 * (h/range) - 0.5 * (h/range)^3), 
+                nugget + sill)
+  return(val)
+}
+
+
+h_seq <- seq(0, max(vg_gstat$dist), length.out=100)
+line_fit_geor <- data.frame(dist = h_seq, 
+                            gamma = sph_curve(h_seq, nug_ml, sigsq_ml, phi_ml))
+
+p2 <- ggplot() +
+  geom_point(data=vg_gstat, aes(x=dist, y=gamma), size=3, color="darkorange") + # Usando pontos do gstat como base empírica
+  geom_line(data=line_fit_geor, aes(x=dist, y=gamma), color="black", linewidth=1) +
+  labs(title = "Ajuste GeoR (Máxima Verossimilhança)",
+       subtitle = paste0("Nugget: ", round(nug_ml, 3), 
+                         " | Sill: ", round(sigsq_ml, 3),
+                         " | Range: ", round(phi_ml, 1)),
+       x = "Distância (km)", y = "Semivariância") +
+  theme_minimal(base_size = 14) + ylim(0, NA)
+
+grid.arrange(p1, p2, ncol=2)
+```

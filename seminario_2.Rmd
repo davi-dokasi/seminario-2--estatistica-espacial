@@ -41,6 +41,10 @@ Aplicaremos a transformação logarítmica na variável de interesse para tornar
 ```{r}
 data(parana) 
 
+# geoR usa ja objetos com dados transformados
+parana_log <- parana
+parana_log$data <- log(parana$data)
+
 df_parana <- as.data.frame(parana$coords)
 df_parana$rain <- parana$data
 df_parana$log_rain <- log(parana$data)
@@ -51,6 +55,7 @@ df_parana$log_rain <- log(parana$data)
 Com os histogramas, podemos comparar a distribuição da variável original (rain) com a variável transformada (log_rain).
 
 ```{r}
+coordinates(df_parana) <- ~east+north
 sp::proj4string(df_parana) <- sp::CRS("+proj=utm +zone=22 +south +ellps=GRS80 +units=km") 
 
 p1 <- ggplot(as.data.frame(df_parana), aes(x = rain)) +
@@ -78,7 +83,7 @@ vg_gstat <- variogram(log_rain ~ 1, df_parana, cutoff = maxdist/2)
 plot(vg_gstat, main="Variograma empirico (gstat) - log(rain)")
 
 # 3) Variograma geoR
-vg_geoR <- variog(parana, max.dist = max(vg_gstat$dist))
+vg_geoR <- variog(parana_log, max.dist = max(vg_gstat$dist))
 
 plot(vg_geoR$u, vg_geoR$v, pch=20, col="gray40",
      main="Variograma empirico (geoR) - log(rain)", xlab="dist", ylab="semi")
@@ -119,7 +124,7 @@ plot(vg_gstat, model=fit_vg)
 ini_cov_pars <- c(0.1, maxdist/5) 
 ini_nugget <- 0.01
 
-lik_ml <- likfit(parana,
+lik_ml <- likfit(parana_log,
                  ini.cov.pars = ini_cov_pars,
                  nugget = ini_nugget,
                  trend = "cte",
@@ -169,8 +174,8 @@ Vamos usar o modelo teórico ajustado na etapa anterior para fazer a Krigagem. O
 #grid de predição
 bbox <- as.data.frame(bbox(df_parana))
 
-x_range <- seq(bbox[1, 1], bbox[1, 2], by = 1000) 
-y_range <- seq(bbox[2, 1], bbox[2, 2], by = 1000) 
+x_range <- seq(bbox[1, 1], bbox[1, 2], by = 10) 
+y_range <- seq(bbox[2, 1], bbox[2, 2], by = 10) 
 
 grid_pred <- expand.grid(east = x_range, north = y_range)
 
@@ -212,4 +217,3 @@ Resumir os achados e interpretar os parâmetros estimados no contexto do problem
 - Validar se a estrutura de dependência espacial modelada faz sentido com o fenômeno físico da chuva.
 
 - Limitações: discutir a incerteza das previsões com base nos mapas de variância da Krigagem e sugerir melhorias (ex: considerar anisotropia, tendências, ou outras covariáveis).
-
