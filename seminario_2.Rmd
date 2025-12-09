@@ -1,0 +1,219 @@
+---
+title: "Estatística espacial - Seminário 2"
+subtitle: 'Modelagem Geoestatística da Precipitação no Paraná'
+author: "Davi Augusto, Eduardo Garcez e João Arend"
+date: "2025"
+output:
+  html_document:
+  toc: true
+number_sections: true
+toc_float:
+  collapsed: false
+smooth_scroll: false
+---
+
+## 1. Objetivo
+  
+O objetivo principal desta análise geoestatística é modelar e quantificar a estrutura de dependência espacial da precipitação (chuva, usando $\log(\text{chuva})$ para normalização) no estado do Paraná, Brasil, usando o banco parana, do pacote geoR. Nesse sentido, propósito é obter os parâmetros do variograma para, posteriormente, realizar a Krigagem (interpolação) e prever os níveis de precipitação em locais não amostrados, fornecendo um mapa contínuo da distribuição da chuva na área estudada.
+
+## 2. Sobre a base de dados
+
+O conjunto de dados parana contém as coordenadas geográficas (east e north) e o valor da precipitação (rain) em cada ponto de amostragem.
+
+### Carregando os pacotes necessários (a ordem importa nesse caso)
+
+```{r, echo = FALSE, message=FALSE, warning=FALSE, error=FALSE}
+library(sp)
+library(gstat)
+library(geoR)
+library(sf)
+library(ggplot2)
+library(dplyr)
+library(raster)
+library(gridExtra)
+set.seed(123)
+```
+
+### Preparando a base de dados e a variável de estudo
+
+Aplicaremos a transformação logarítmica na variável de interesse para tornar a distribuição dos dados mais próxima da normal, melhorando a validade das suposições do modelo como um todo.
+
+```{r}
+data(parana) 
+
+# geoR usa ja objetos com dados transformados
+parana_log <- parana
+parana_log$data <- log(parana$data)
+
+df_parana <- as.data.frame(parana$coords)
+df_parana$rain <- parana$data
+df_parana$log_rain <- log(parana$data)
+```
+
+### Verificando a distribuição da variável de estudo com histogramas
+
+Com os histogramas, podemos comparar a distribuição da variável original (rain) com a variável transformada (log_rain).
+
+```{r}
+coordinates(df_parana) <- ~east+north
+sp::proj4string(df_parana) <- sp::CRS("+proj=utm +zone=22 +south +ellps=GRS80 +units=km") 
+
+p1 <- ggplot(as.data.frame(df_parana), aes(x = rain)) +
+  geom_histogram(bins = 30, fill = "steelblue") +
+  theme_minimal() + labs(title="Histograma rain")
+
+p2 <- ggplot(as.data.frame(df_parana), aes(x = log_rain)) +
+  geom_histogram(bins = 30, fill = "darkorange") +
+  theme_minimal() + labs(title="Histograma log(rain)")
+
+grid.arrange(p1, p2, ncol=2)
+```
+
+## 3. Modelo e Estrutura de Dependência
+
+Agora vamos calcular e plotar o variograma empírico. Ao calcular e visualizar o Variograma Empírico, poderemos entender como a dissimilaridade (semivariância) entre os pontos amostrados aumenta com o aumento da distância entre eles.
+
+Para garantir consistência, o cálculo do variograma será realizado usando tanto a abordagem do gstat quanto do geoR.
+
+```{r}
+# variograma empírico gstat
+maxdist <- max(dist(sp::coordinates(df_parana)))
+vg_gstat <- variogram(log_rain ~ 1, df_parana, cutoff = maxdist/2)
+
+plot(vg_gstat, main="Variograma empirico (gstat) - log(rain)")
+
+# 3) Variograma geoR
+vg_geoR <- variog(parana_log, max.dist = max(vg_gstat$dist))
+
+plot(vg_geoR$u, vg_geoR$v, pch=20, col="gray40",
+     main="Variograma empirico (geoR) - log(rain)", xlab="dist", ylab="semi")
+```
+
+- verificar se no variograma existem pontos muito altos em distâncias pequenas
+- buracos na parte inferior podem indicar problemas de amostragem
+- anisotropia pode ser considerada se variogramas direcionais forem muito diferentes
+
+## 4. Estimação e Ajuste do Modelo
+
+Nesta etapa, vamos ajustar um modelo de covariância paramétrico, neste caso, o Modelo Esférico, ao Variograma Empírico utilizando a Máxima Verossimilhança (ML) através da função geoR::likfit, um método frequentista para obter a estimativa mais provável dos parâmetros que definem o Variograma Teórico.
+
+### Estimação dos Parâmetros: O ajuste gera estimativas para:
+
+- Efeito Pepita ($\tau^2$): Variabilidade em distâncias muito curtas.
+- Patamar Parcial ($\sigma^2$): A porção da variância total explicada pela estrutura espacial.
+- Alcance ($\phi$): A distância a partir da qual os pontos são considerados independentes.
+ 
+### Validação
+
+O Variograma Teórico ajustado é plotado sobre os pontos do Variograma Empírico para avaliar a qualidade do ajuste visualmente.
+   
+- Ajuste de Parâmetros (ML): Seção 4.1
+- Visualização do Ajuste: Seção 4.2
+
+```{r}
+# Ajuste paramétrico gstat
+
+init_model <- vgm(psill = var(df_parana$log_rain), model="Sph",
+                  range=maxdist/3, nugget=0.01)
+
+fit_vg <- fit.variogram(vg_gstat, model=init_model)
+plot(vg_gstat, model=fit_vg)
+
+# 4.1 Ajuste ML (geoR::likfit) - Estimação Final
+
+ini_cov_pars <- c(0.1, maxdist/5) 
+ini_nugget <- 0.01
+
+lik_ml <- likfit(parana_log,
+                 ini.cov.pars = ini_cov_pars,
+                 nugget = ini_nugget,
+                 trend = "cte",
+                 cov.model = "sph",
+                 lik.method = "ML")
+
+# Extração dos parâmetros
+beta_ml   <- lik_ml$beta
+sigsq_ml  <- lik_ml$cov.pars[1]
+phi_ml    <- lik_ml$cov.pars[2]
+nugget_ml <- lik_ml$nugget
+
+cat("Sigma2 (Sill Parcial):", sigsq_ml, "\n")
+cat("Range (Alcance):", phi_ml, "\n")
+cat("Nugget (Efeito Pepita):", nugget_ml, "\n")
+
+# 4.2 Variograma teórico ML - parte da validação
+
+sph_vario <- function(h, nugget, sill, range){
+  g <- rep(0, length(h))
+  hr <- h/range
+  id1 <- which(h <= range)
+  id2 <- which(h > range)
+  g[id1] <- nugget + sill*(1.5*hr[id1] - 0.5*hr[id1]^3)
+  g[id2] <- nugget + sill
+  g
+}
+
+hgrid <- seq(0, max(vg_gstat$dist), length.out=200)
+vg_theo <- sph_vario(hgrid, nugget_ml, sigsq_ml, phi_ml)
+
+df_emp <- data.frame(dist=vg_gstat$dist, gamma=vg_gstat$gamma)
+df_theo <- data.frame(dist=hgrid, gamma=vg_theo)
+
+ggplot() +
+  geom_point(data=df_emp, aes(dist, gamma)) +
+  geom_line(data=df_theo, aes(dist, gamma), color="red") +
+  theme_minimal() +
+  labs(title="Empírico vs Teórico (ML) - log(rain)")
+```
+
+## 5. Resultados e Predição por Krigagem
+
+Vamos usar o modelo teórico ajustado na etapa anterior para fazer a Krigagem. O modelo de Krigagem Ordinária (BLUP) será formulado usando os mesmos parâmetros $\tau^2$, $\sigma^2$ e $\phi$ estimados por máxima verossimilhança.
+
+```{r}
+#grid de predição
+bbox <- as.data.frame(bbox(df_parana))
+
+x_range <- seq(bbox[1, 1], bbox[1, 2], by = 10) 
+y_range <- seq(bbox[2, 1], bbox[2, 2], by = 10) 
+
+grid_pred <- expand.grid(east = x_range, north = y_range)
+
+#acho que o erro está aqui, tentei reduzir o número de passos no by = 1000 mas não adiantou
+sp::coordinates(grid_pred) <- ~east+north
+sp::gridded(grid_pred) <- TRUE
+sp::proj4string(grid_pred) <- sp::CRS(proj4string(df_parana)) #Usa o CRS do objeto original
+
+#modelo gstat com parâmetros ML
+vg_ml <- vgm(psill = sigsq_ml, model = "Sph", range = phi_ml, nugget = nugget_ml)
+
+g <- gstat(NULL, "log_rain", log_rain ~ 1, data = df_parana, model = vg_ml)
+
+#Krigagem no grid
+krig_res <- predict(g, newdata = grid_pred)
+
+#Visualização dos resultados da predição (log_rain)
+krig_pred_r <- raster::raster(krig_res, layer=1) # Predição (log_rain)
+krig_var_r  <- raster::raster(krig_res, layer=2) # Variância de Krigagem (erro)
+
+#plot da Predição (log_rain)
+plot(krig_pred_r, main = "Krigagem BLUP — Predição log(rain)",
+     col = topo.colors(50))
+points(df_parana, pch = 20, cex = 0.5)
+
+#plot da Variância (Incerteza)
+plot(krig_var_r, main = "Krigagem BLUP — Variância de Predição",
+     col = heat.colors(50))
+points(df_parana, pch = 20, cex = 0.5)
+```
+importante: interpretar a predição de precipitação do log(chuva) e o respectivo erro de variância em cada ponto de um grid não amostrado.
+
+## 6. Conclusão
+
+Resumir os achados e interpretar os parâmetros estimados no contexto do problema de precipitação.
+
+- Discutir o valor do Alcance ($\phi$) tipo: "A precipitação em um local é espacialmente correlacionada com locais até X quilômetros de distância" e a importância relativa no nosso caso do Efeito Pepita, indicando a quantidade de variabilidade não explicada pela distância.
+
+- Validar se a estrutura de dependência espacial modelada faz sentido com o fenômeno físico da chuva.
+
+- Limitações: discutir a incerteza das previsões com base nos mapas de variância da Krigagem e sugerir melhorias (ex: considerar anisotropia, tendências, ou outras covariáveis).
