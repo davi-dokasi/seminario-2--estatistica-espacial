@@ -10,7 +10,7 @@
   <meta name="generator" content="quarto-1.8.26">
 
   <meta name="author" content="Davi Augusto, Eduardo Garcez e João Arend">
-  <title>…</title>
+  <title>Análise Geoestatística da Precipitação no Paraná</title>
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, minimal-ui">
@@ -127,7 +127,7 @@
     <div class="slides">
 
 <section id="title-slide" class="quarto-title-block center">
-  <h1 class="title">…</h1>
+  <h1 class="title">Análise Geoestatística da Precipitação no Paraná</h1>
   <p class="subtitle">Seminário 2 - Estatística Espacial</p>
 
 <div class="quarto-title-authors">
@@ -139,59 +139,63 @@ Davi Augusto, Eduardo Garcez e João Arend
 </div>
 
 </section>
-<section id="objetivo" class="slide level2 center">
+<section id="objetivo" class="slide level2 smaller center">
 <h2>Objetivo</h2>
 <p>O objetivo deste trabalho é analisar a dependência espacial da precipitação média acumulada no estado do Paraná e realizar a predição espacial (interpolação) em locais não observados utilizando técnicas de Geoestatística vistas em aula.</p>
-<h3 id="o-problema">O Problema</h3>
-<ul>
-<li><p>bla bla bla</p></li>
-<li><p><strong>Desafio:</strong></p></li>
-</ul>
-<p>. . .</p>
-<blockquote>
-<p>“A geoestatística nos permite preencher as lacunas do mapa com rigor matemático.”</p>
-</blockquote>
 </section>
-<section id="base-de-dados" class="slide level2 center">
+<section id="base-de-dados" class="slide level2 smaller center">
 <h2>Base de dados</h2>
-<p>Dados de 143 estações pluviométricas.</p>
+<p>Formado por 143 estações pluviométricas, medindo a precipitação média em diferentes anos no período de Maio - Junho (estação seca).</p>
 <div class="columns">
-<div class="column" style="width:50%;">
-<p><strong>Especificações:</strong></p>
+<div class="column" style="width:35%;">
+<p><strong>Características:</strong></p>
 <ul>
-<li><strong>Fonte:</strong> RIBEIRO JR., P.J.; DIGGLE, P.J.geoR: A package for geostatistical analysis. R News, v.1, n.2, p.15–18, 2001.</li>
-<li><strong>Estado:</strong> Paraná</li>
-<li><strong>Variável:</strong> Precipitação média acumulada</li>
+<li><strong>Região:</strong> Estado do Paraná, Brasil.</li>
+<li><strong>Variável (<span class="math inline">\(Y\)</span>):</strong> Precipitação média.</li>
+<li><strong>Coords:</strong> Coordenadas das estações.</li>
 </ul>
-</div><div class="column" style="width:50%;">
-<p><strong>Estrutura:</strong></p>
+</div><div class="column" style="width:65%;">
+<div class="cell">
+<div class="cell-output-display">
 <table class="caption-top">
 <thead>
 <tr class="header">
 <th style="text-align: center;">ID</th>
-<th style="text-align: center;">Coord X</th>
-<th style="text-align: center;">Coord Y</th>
-<th style="text-align: center;">Precipitação</th>
+<th style="text-align: center;">east</th>
+<th style="text-align: center;">north</th>
+<th style="text-align: center;">data</th>
 </tr>
 </thead>
 <tbody>
 <tr class="odd">
 <td style="text-align: center;">1</td>
-<td style="text-align: center;">403</td>
-<td style="text-align: center;">164.5</td>
+<td style="text-align: center;">402.953</td>
+<td style="text-align: center;">164.528</td>
 <td style="text-align: center;">306.09</td>
 </tr>
 <tr class="even">
 <td style="text-align: center;">2</td>
-<td style="text-align: center;">501.7</td>
-<td style="text-align: center;">428.8</td>
+<td style="text-align: center;">501.705</td>
+<td style="text-align: center;">428.771</td>
 <td style="text-align: center;">200.88</td>
 </tr>
 <tr class="odd">
 <td style="text-align: center;">3</td>
-<td style="text-align: center;">556.3</td>
-<td style="text-align: center;">445.3</td>
+<td style="text-align: center;">556.326</td>
+<td style="text-align: center;">445.271</td>
 <td style="text-align: center;">167.07</td>
+</tr>
+<tr class="even">
+<td style="text-align: center;">4</td>
+<td style="text-align: center;">573.404</td>
+<td style="text-align: center;">447.042</td>
+<td style="text-align: center;">162.77</td>
+</tr>
+<tr class="odd">
+<td style="text-align: center;">5</td>
+<td style="text-align: center;">702.423</td>
+<td style="text-align: center;">272.296</td>
+<td style="text-align: center;">163.57</td>
 </tr>
 <tr class="even">
 <td style="text-align: center;">…</td>
@@ -201,6 +205,8 @@ Davi Augusto, Eduardo Garcez e João Arend
 </tr>
 </tbody>
 </table>
+</div>
+</div>
 </div></div>
 </section>
 <section id="exploratória" class="slide level2 center">
@@ -273,7 +279,6 @@ Davi Augusto, Eduardo Garcez e João Arend
 </section>
     </div>
   <div class="quarto-auto-generated-content" style="display: none;">
-<p><img src="https://blog-static.infra.grancursosonline.com.br/wp-content/uploads/2015/05/03164040/ufrgs_cor.png" class="slide-logo"></p>
 <div class="footer footer-default">
 
 </div>

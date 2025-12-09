@@ -1,0 +1,40 @@
+## Objetivo {.smaller}
+
+O objetivo deste trabalho é analisar a dependência espacial da precipitação média acumulada no estado do Paraná e realizar a predição espacial (interpolação) em locais não observados utilizando técnicas de Geoestatística vistas em aula.
+
+---
+
+## Base de dados {.smaller}
+
+Formado por 143 estações pluviométricas, medindo a precipitação média em diferentes anos no período de Maio - Junho (estação seca).
+
+::::: columns
+::: {.column width="35%"}
+
+**Características:**
+
+- **Região:** Estado do Paraná, Brasil.
+- **Variável ($Y$):** Precipitação média.
+- **Coords:** Coordenadas das estações.
+:::
+
+::: {.column width="65%"}
+
+```{r head}
+
+tabela <- data.frame(
+  ID = 1:5,
+  east = round(parana$coords[1:5, 1], 3),
+  north = round(parana$coords[1:5, 2], 3),
+  data = parana$data[1:5]
+)
+tabela_qmd <- rbind(as.matrix(tabela), c("...", "...", "...", "..."))
+
+knitr::kable(tabela_qmd,
+             #col.names = c("ID", "Coord X", "Coord Y", "Precipitação Média"),
+             align = "c")
+
+```
+
+:::
+:::::
