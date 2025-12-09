@@ -1,5 +1,5 @@
 ---
-title: "..."
+title: "Análise Geoestatística da Precipitação no Paraná"
 subtitle: "Seminário 2 - Estatística Espacial"
 author: "Davi Augusto, Eduardo Garcez e João Arend"
 format:
@@ -10,8 +10,7 @@ format:
     show-notes: false
     code-fold: true
     center: true
-    logo: "https://blog-static.infra.grancursosonline.com.br/wp-content/uploads/2015/05/03164040/ufrgs_cor.png"
-editor: visual
+    logo: ""
 ---
 
 ```{r setup, include=FALSE}
@@ -22,25 +21,15 @@ library(knitr)
 data(parana)
 ```
 
-## Objetivo
+## Objetivo {.smaller}
 
 O objetivo deste trabalho é analisar a dependência espacial da precipitação média acumulada no estado do Paraná e realizar a predição espacial (interpolação) em locais não observados utilizando técnicas de Geoestatística vistas em aula.
 
-### O Problema
+---
 
--   bla bla bla
+## Base de dados {.smaller}
 
--   **Desafio:**
-
-. . .
-
-> "A geoestatística nos permite preencher as lacunas do mapa com rigor matemático."
-
-------------------------------------------------------------------------
-
-## Base de dados
-
-Dados de 143 estações pluviométricas.
+Formado por 143 estações pluviométricas, medindo a precipitação média em diferentes anos no período de Maio - Junho (estação seca).
 
 ::::: columns
 ::: {.column width="50%"}
