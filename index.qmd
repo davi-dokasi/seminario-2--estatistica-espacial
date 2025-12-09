@@ -1,0 +1,67 @@
+---
+title: "..."
+subtitle: "Seminário 2 - Estatística Espacial"
+author: "Davi Augusto, Eduardo Garcez e João Arend"
+format:
+  revealjs:
+    theme: simple
+    transition: slide
+    slide-number: true
+    show-notes: false
+    code-fold: true
+    center: true
+    logo: "https://blog-static.infra.grancursosonline.com.br/wp-content/uploads/2015/05/03164040/ufrgs_cor.png"
+editor: visual
+---
+
+## Introdução
+
+### O Problema
+
+- bla bla bla
+- **Desafio:**
+
+. . .
+
+> "A geoestatística nos permite preencher as lacunas do mapa com rigor matemático."
+
+---
+
+## Base de dados
+
+Utilizamos dados ....
+
+::: {.columns}
+
+::: {.column width="50%"}
+**Especificações:**
+
+- **Fonte:**
+- **Ano:**
+- **Estado:**
+- **Variável:**
+:::
+
+::: {.column width="50%"}
+**Estrutura:**
+
+| ID Estação | Lat | Long | PM2.5 ($\mu g/m^3$) |
+|:---:|:---:|:---:|:---:|
+| 06-001 | 37.7 | -122.4 | 8.5 |
+| 06-002 | 34.0 | -118.2 | 12.1 |
+| ... | ... | ... | ... |
+
+:::
+:::
+
+---
+
+## Exploratória
+
+
+## Modelos
+
+## Resultados
+
+## Conclusão
+
