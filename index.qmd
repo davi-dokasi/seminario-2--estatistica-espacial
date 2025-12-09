@@ -14,54 +14,61 @@ format:
 editor: visual
 ---
 
-## Introdução
+```{r setup, include=FALSE}
+library(geoR)
+library(knitr)
+# library(kable)
+
+data(parana)
+```
+
+## Objetivo
+
+O objetivo deste trabalho é analisar a dependência espacial da precipitação média acumulada no stado do Paraná e realizar a predição espacial (interpolação) em locais não observados utilizando técnicas de Geoestatística vistas em aula.
 
 ### O Problema
 
-- bla bla bla
-- **Desafio:**
+-   bla bla bla
+
+-   **Desafio:**
 
 . . .
 
 > "A geoestatística nos permite preencher as lacunas do mapa com rigor matemático."
 
----
+------------------------------------------------------------------------
 
 ## Base de dados
 
-Utilizamos dados ....
+Dados de 143 estações pluviométricas.
 
-::: {.columns}
-
+::::: columns
 ::: {.column width="50%"}
 **Especificações:**
 
-- **Fonte:**
-- **Ano:**
-- **Estado:**
-- **Variável:**
+-   **Fonte:** RIBEIRO JR., P.J.; DIGGLE, P.J.geoR: A package for geostatistical analysis. R News, v.1, n.2, p.15–18, 2001.
+-   **Estado:** Paraná
+-   **Variável:** Precipitação média acumulada
 :::
 
 ::: {.column width="50%"}
 **Estrutura:**
 
-| ID Estação | Lat | Long | PM2.5 ($\mu g/m^3$) |
-|:---:|:---:|:---:|:---:|
-| 06-001 | 37.7 | -122.4 | 8.5 |
-| 06-002 | 34.0 | -118.2 | 12.1 |
-| ... | ... | ... | ... |
-
+| ID  | Coord X | Coord Y | Precipitação |
+|:---:|:-------:|:-------:|:------------:|
+|  1  |   403   |  164.5  |    306.09    |
+|  2  |  501.7  |  428.8  |    200.88    |
+|  3  |  556.3  |  445.3  |    167.07    |
+| ... |   ...   |   ...   |     ...      |
 :::
-:::
+:::::
 
----
+------------------------------------------------------------------------
 
 ## Exploratória
-
 
 ## Modelos
 
 ## Resultados
 
 ## Conclusão
-
