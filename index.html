@@ -267,12 +267,55 @@ Davi Augusto, Eduardo Garcez e João Arend
 </div>
 </div></div>
 </section>
+<section id="histogramas" class="slide level2 center">
+<h2>Histogramas</h2>
+<div style="font-size: 70%;">
+<p>Para krigagem é desejável que a variável siga uma distribuição aproximadamente normal. A nossa aparentemente já está próxima disso, porém deixaremos a transformação log para seguir alguns exemplos vistos em aula.</p>
+</div>
+
+<img data-src="index_files/figure-revealjs/histogramas-1.png" width="960" class="r-stretch"></section>
 <section id="modelos" class="slide level2 center">
 <h2>Modelos</h2>
 </section>
+<section id="estrutura-de-dependências" class="slide level2 center">
+<h2>Estrutura de Dependências:</h2>
+<div style="font-size: 55%;">
+<p>Agora vamos calcular e plotar o variograma empírico. Ao calcular e visualizar o Variograma Empírico, poderemos entender como a dissimilaridade (semivariância) entre os pontos amostrados aumenta com o aumento da distância entre eles.</p>
+<p>Para garantir consistência, o cálculo do variograma será realizado usando tanto a abordagem do gstat quanto do geoR.</p>
+</div>
+
+<img data-src="index_files/figure-revealjs/variogramas-1.png" width="960" class="r-stretch"></section>
+<section id="estimação-e-ajuste-de-modelos" class="slide level2 center">
+<h2>Estimação e Ajuste de Modelos:</h2>
+<div style="font-size: 80%;">
+<p>Utilizamos a função <strong><em>geoR::likfit</em></strong> para ajustar um modelo esférico ao variograma empírico através de máxima verossimilhança (ML).</p>
+<p>Este modelo paramétrico é um método frequentista para obter a estimativa mais provável dos parâmetros que definem o variograma teórico.</p>
+<p><br></p>
+<p><strong>O ajuste gera estimativas para:</strong></p>
+<ul>
+<li><p>Efeito Pepita <span class="math inline">\((τ^2)\)</span>: Variabilidade em distâncias muito curtas.</p></li>
+<li><p>Patamar Parcial <span class="math inline">\((σ^2)\)</span>: A porção da variância total explicada pela estrutura espacial.</p></li>
+<li><p>Alcance <span class="math inline">\((ϕ)\)</span>: A distância a partir da qual os pontos são considerados independentes.</p></li>
+</ul>
+</div>
+</section>
+<section id="validação" class="slide level2 center">
+<h2>Validação:</h2>
+<div style="font-size: 75%;">
+<p>O Variograma Teórico ajustado é plotado sobre os pontos do Variograma Empírico para avaliar a qualidade do ajuste visualmente.</p>
+</div>
+
+<img data-src="index_files/figure-revealjs/validacao_modelos-1.png" class="quarto-figure quarto-figure-center r-stretch" width="1248"></section>
 <section id="resultados" class="slide level2 center">
 <h2>Resultados</h2>
 </section>
+<section id="resultados-e-predição-por-krigagem" class="slide level2 center">
+<h2>Resultados e Predição por Krigagem</h2>
+<div style="font-size: 70%;">
+<p>Vamos usar o modelo teórico ajustado na etapa anterior para fazer a Krigagem. O modelo de Krigagem Ordinária (BLUP) será formulado usando os mesmos parâmetros <span class="math inline">\(τ^2\)</span>, <span class="math inline">\(σ^2\)</span> e <span class="math inline">\(ϕ\)</span> estimados por máxima verossimilhança.</p>
+</div>
+
+<img data-src="index_files/figure-revealjs/krigagem-1.png" class="quarto-figure quarto-figure-center r-stretch" width="1344"></section>
 <section id="conclusão" class="slide level2 center">
 <h2>Conclusão</h2>
 

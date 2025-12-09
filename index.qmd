@@ -16,9 +16,23 @@ format:
 ```{r setup, include=FALSE}
 library(geoR)
 library(knitr)
-# library(kable)
-
+library(sp)
+library(gstat)
+library(sf)
+library(ggplot2)
+library(dplyr)
+library(raster)
+library(gridExtra)
+set.seed(123)
 data(parana)
+
+# geoR usa ja objetos com dados transformados
+parana_log <- parana
+parana_log$data <- log(parana$data)
+
+df_parana <- as.data.frame(parana$coords)
+df_parana$rain <- parana$data
+df_parana$log_rain <- log(parana$data)
 ```
 
 {{< include _context.qmd >}}
@@ -26,6 +40,10 @@ data(parana)
 
 ## Modelos
 
+{{< include _model.qmd >}}
+
 ## Resultados
+
+{{< include _results.qmd >}}
 
 ## Conclusão

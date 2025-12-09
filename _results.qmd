@@ -1,0 +1,50 @@
+## Resultados e Predição por Krigagem
+::: {style="font-size: 70%;"}
+Vamos usar o modelo teórico ajustado na etapa anterior para fazer a Krigagem. O modelo de Krigagem Ordinária (BLUP) será formulado usando os mesmos parâmetros $τ^2$, $σ^2$ e $ϕ$ estimados por máxima verossimilhança.
+:::
+
+```{r krigagem}
+maxdist <- max(dist(parana$coords))
+lik_ml <- likfit(parana_log, ini.cov.pars = c(0.1, maxdist/5), nugget = 0.01,
+                 trend = "cte", cov.model = "sph", lik.method = "ML", messages = FALSE)
+
+sigsq_ml  <- lik_ml$cov.pars[1]
+phi_ml    <- lik_ml$cov.pars[2]
+nugget_ml <- lik_ml$nugget
+
+# DEFINIR O GRID
+bbox <- as.data.frame(bbox(df_parana))
+x_range <- seq(bbox[1, 1], bbox[1, 2], by = 5) 
+y_range <- seq(bbox[2, 1], bbox[2, 2], by = 5) 
+grid_pred <- expand.grid(east = x_range, north = y_range)
+
+sp::coordinates(grid_pred) <- ~east+north
+sp::gridded(grid_pred) <- TRUE
+sp::proj4string(grid_pred) <- sp::CRS(proj4string(df_parana))
+
+# EXECUTAR A KRIGAGEM
+vg_ml <- vgm(psill = sigsq_ml, model = "Sph", range = phi_ml, nugget = nugget_ml)
+g <- gstat(NULL, "log_rain", log_rain ~ 1, data = df_parana, model = vg_ml)
+
+# Predição
+krig_res <- predict(g, newdata = grid_pred, debug.level = 0)
+
+krig_pred_r <- raster::raster(krig_res, layer=1) # Predição
+krig_var_r  <- raster::raster(krig_res, layer=2) # Variância
+
+
+par(mfrow = c(1, 2), mar = c(4, 4, 3, 6))
+
+
+#Visualização dos resultados da predição (log_rain)
+plot(krig_pred_r, main = "Krigagem BLUP — Predição log(rain)", col = topo.colors(50))
+lines(parana$borders, col="gray30")
+points(df_parana, pch = 20, cex = 0.5)
+
+#plot da Variância (Incerteza)
+plot(krig_var_r, main = "Krigagem BLUP — Variância de Predição", col = heat.colors(50))
+lines(parana$borders, col="gray30") 
+points(df_parana, pch = "+", cex = 0.6, col="black") 
+
+par(mfrow = c(1, 1), mar = c(5, 4, 4, 2) + 0.1)
+```
