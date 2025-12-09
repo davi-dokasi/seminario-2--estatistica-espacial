@@ -1,0 +1,35 @@
+## Exploratória
+
+::::: columns
+::: {.column width="40%"}
+### Resumo
+
+::: {style="font-size: 85%;"}
+| Estatística | Valor |
+|:-----------:|:-----:|
+| Mínimo | 162.77 |
+| 1º Quartil | 234.19 |
+| Mediana | 269.92 |
+| Média | 274.41 |
+| 3º Quartil | 318.23 |
+| Máximo | 413.70 |
+| Desvio Padrão | 57.38 |
+:::
+
+:::
+
+::: {.column width="60%"}
+### Visualização Espacial
+
+```{r}
+#| echo: false
+#| fig-height: 6
+#| fig-width: 7
+#| fig-align: center
+
+par(mar=c(3,3,2,1), mgp=c(2,0.7,0))
+plot(parana)
+```
+
+:::
+:::::

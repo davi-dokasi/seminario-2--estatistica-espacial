@@ -8,7 +8,7 @@ format:
     transition: slide
     slide-number: true
     show-notes: false
-    code-fold: true
+    #code-fold: true
     center: true
     logo: ""
 ---
@@ -21,75 +21,8 @@ library(knitr)
 data(parana)
 ```
 
-## Objetivo {.smaller}
-
-O objetivo deste trabalho é analisar a dependência espacial da precipitação média acumulada no estado do Paraná e realizar a predição espacial (interpolação) em locais não observados utilizando técnicas de Geoestatística vistas em aula.
-
----
-
-## Base de dados {.smaller}
-
-Formado por 143 estações pluviométricas, medindo a precipitação média em diferentes anos no período de Maio - Junho (estação seca).
-
-::::: columns
-::: {.column width="50%"}
-**Especificações:**
-
--   **Fonte:** RIBEIRO JR., P.J.; DIGGLE, P.J.geoR: A package for geostatistical analysis. R News, v.1, n.2, p.15–18, 2001.
--   **Estado:** Paraná
--   **Variável:** Precipitação média acumulada
-:::
-
-::: {.column width="50%"}
-**Estrutura:**
-
-| ID  | Coord X | Coord Y | Precipitação |
-|:---:|:-------:|:-------:|:------------:|
-|  1  |   403   |  164.5  |    306.09    |
-|  2  |  501.7  |  428.8  |    200.88    |
-|  3  |  556.3  |  445.3  |    167.07    |
-| ... |   ...   |   ...   |     ...      |
-:::
-:::::
-
-------------------------------------------------------------------------
-
-## Exploratória
-
-::::: columns
-::: {.column width="40%"}
-### Resumo
-
-::: {style="font-size: 85%;"}
-| Estatística | Valor |
-|:-----------:|:-----:|
-| Mínimo | 162.77 |
-| 1º Quartil | 234.19 |
-| Mediana | 269.92 |
-| Média | 274.41 |
-| 3º Quartil | 318.23 |
-| Máximo | 413.70 |
-| Desvio Padrão | 57.38 |
-:::
-
-:::
-
-::: {.column width="60%"}
-### Visualização Espacial
-
-```{r}
-#| echo: false
-#| fig-height: 6
-#| fig-width: 7
-#| fig-align: center
-
-par(mar=c(3,3,2,1), mgp=c(2,0.7,0)) 
-plot(parana)
-```
-
-:::
-:::::
-
+{{< include _context.qmd >}}
+{{< include _explor.qmd >}}
 
 ## Modelos
 
