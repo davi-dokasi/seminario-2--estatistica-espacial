@@ -1,50 +1,52 @@
 ## Exploratória
 
-::::: columns
-::: {.column width="40%"}
+::: {.panel-tabset}
+
 ### Resumo
 
-::: {style="font-size: 85%;"}
-| Estatística | Valor |
-|:-----------:|:-----:|
-| Mínimo | 162.77 |
-| 1º Quartil | 234.19 |
-| Mediana | 269.92 |
-| Média | 274.41 |
-| 3º Quartil | 318.23 |
-| Máximo | 413.70 |
-| Desvio Padrão | 57.38 |
+::: {.grid}
+::: {.g-col-6}
+::: {style="font-size: 75%;"}
+```{r}
+data(parana)
+stats <- summary(parana$data)
+stats["Sd"] <- sd(parana$data)
+knitr::kable(t(stats),
+             align = "c")
+```
+:::
+:::
+::: {.g-col-6}
+```{r}
+boxplot(parana$data, horizontal = TRUE)
+```
+:::
 :::
 
-:::
-
-::: {.column width="60%"}
-### Visualização Espacial
+### Plot do Objeto
 
 ```{r}
-par(mar=c(3,3,2,1), mgp=c(2,0.7,0))
+# par(mar=c(3,3,2,1), mgp=c(2,0.7,0))
 plot(parana)
 ```
 
 :::
-:::::
-
 
 ## Histogramas
 ::: {style="font-size: 70%;"}
-Para krigagem é desejável que a variável siga uma distribuição aproximadamente normal. A nossa aparentemente já está próxima disso, porém deixaremos a transformação log para seguir alguns exemplos vistos em aula.
+Para krigagem é desejável que a variável siga uma distribuição aproximadamente normal. A nossa, aparentemente já está próxima disso, porém deixaremos a transformação log para seguir alguns exemplos vistos em aula.
 :::
 
 ```{r histogramas}
 dados_plot <- as.data.frame(df_parana)
-p1 <- ggplot(dados_plot, aes(x=rain)) + 
+p1 <- ggplot(dados_plot, aes(x=rain)) +
   geom_histogram(aes(y = after_stat(density)), fill="steelblue", color="white", bins=20, alpha=0.7) +
   geom_density(color="darkblue", size=1) +
   labs(title="Original", x="Chuva (mm)", y="Densidade") +
   theme_minimal(base_size = 16)
 
 
-p2 <- ggplot(dados_plot, aes(x=log_rain)) + 
+p2 <- ggplot(dados_plot, aes(x=log_rain)) +
   geom_histogram(aes(y = after_stat(density)), fill="darkorange", color="white", bins=20, alpha=0.7) +
   geom_density(color="red", size=1) +
   labs(title="Log-Transformado", x="log(Chuva)", y="Densidade") +

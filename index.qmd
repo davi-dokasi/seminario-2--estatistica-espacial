@@ -1,6 +1,6 @@
 ---
 title: "Análise Geoestatística da Precipitação no Paraná"
-subtitle: "Seminário 2 - Estatística Espacial"
+subtitle: "🌧️ Seminário 2 - Estatística Espacial ⛈️"
 author: "Davi Augusto, Eduardo Garcez e João Arend"
 format:
   revealjs:
