@@ -32,6 +32,53 @@ plot(parana)
 
 :::
 
+## Estado
+
+```{r warning = FALSE}
+library(ggplot2)
+
+
+data(parana)
+df_pontos <- data.frame(X = parana$coords[,1], Y = parana$coords[,2], Chuva = parana$data)
+df_bordas <- data.frame(X = parana$borders[,1], Y = parana$borders[,2])
+
+p1 <- ggplot() +
+  geom_polygon(data = df_bordas, aes(x = X, y = Y),
+               fill = "cornsilk",
+               color = "gray40",
+               size = 0.8) +
+
+  geom_point(data = df_pontos, aes(x = X, y = Y, fill = Chuva),
+             shape = 21,
+             color = "black",
+             size = 3.5,
+             alpha = 0.9) +
+  scale_fill_viridis_c(option = "viridis", direction = -1, name = "Precipitação\n(mm)") +
+  annotation_north_arrow(location = "tl",
+                         which_north = "true",
+                         style = north_arrow_fancy_orienteering,
+                         height = unit(1.5, "cm"),
+                         width = unit(1.5, "cm")) +
+  annotation_scale(location = "br",
+                   width_hint = 0.4,
+                   style = "ticks") +
+
+  coord_fixed(ratio = 1) +
+  theme_bw() +
+  labs(x = "Distância Leste (km)",
+       y = "Distância Norte (km)") +
+  theme(panel.grid.major = element_line(color = "gray90", linetype = "dashed"),
+        panel.background = element_rect(fill = "azure"))
+
+img <- readPNG("images/ra_parana.png")
+g_img <- rasterGrob(img, interpolate = TRUE)
+grid.arrange(p1, g_img, ncol=2)
+```
+
+
+
+
+
 ## Histogramas
 ::: {style="font-size: 70%;"}
 Para krigagem é desejável que a variável siga uma distribuição aproximadamente normal. A nossa, aparentemente já está próxima disso, porém deixaremos a transformação log para seguir alguns exemplos vistos em aula.

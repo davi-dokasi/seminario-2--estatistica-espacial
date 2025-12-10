@@ -23,8 +23,12 @@ library(ggplot2)
 library(dplyr)
 library(raster)
 library(gridExtra)
+library(ggspatial)
+library(png)
+library(grid)
 set.seed(123)
 data(parana)
+
 
 # geoR usa ja objetos com dados transformados
 parana_log <- parana
@@ -47,3 +51,24 @@ df_parana$log_rain <- log(parana$data)
 {{< include _results.qmd >}}
 
 ## Conclusão
+
+Ajuste do modelo esférico via máxima verossimilhança (GeoR):
+
+- **Efeito pepita (τ²)** (0.005) microvariabilidade ou erro de medição em pequenas escalas;
+
+- **Patamar (σ²)** (0.054)  relevante componente espacial estruturado;
+
+- **Alcance (ϕ)** (1022.4) suficientemente grande para caracterizar dependência espacial de médio alcance, justificando a interpolação por krigagem.
+
+## Conclusão
+
+- Há forte dependencia espacial na identidade pluviométrica do Paraná no período;
+
+- Gradiente decrescente de precipitação no sentido Sudoeste-Norte;
+
+- Baixa variância da predição.
+
+
+## Muito obrigado pela atenção!
+
+![](images/despedida.jpg)

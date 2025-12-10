@@ -1,4 +1,4 @@
-## Objetivo {.smaller}
+## Objetivo 🎯 {.smaller}
 
 O objetivo deste trabalho é analisar a dependência espacial da precipitação média acumulada no estado do Paraná e realizar a predição espacial (interpolação) em locais não observados utilizando técnicas de Geoestatística vistas em aula.
 
